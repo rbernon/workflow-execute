@@ -14,8 +14,10 @@ async function run() {
 
     console.log(`Listing runs for workflow ${owner}/${repo}#${workflow}`);
     const runs = await octokit.paginate(
-      octokit.rest.actions.listWorkflowRuns,
-      {owner: owner, repo: repo, workflow_id: workflow, branch: branch, per_page: 100},
+      workflow !== 'all' ? octokit.rest.actions.listWorkflowRuns
+                         : octokit.rest.actions.listWorkflowRunsForRepo,
+      workflow !== 'all' ? {owner: owner, repo: repo, workflow_id: workflow, branch: branch, per_page: 100}
+                         : {owner: owner, repo: repo, per_page: 100},
       response => response.data.filter(run => {
         if (run.status !== "completed") return false;
         if (new Date().getTime() < new Date(run.created_at).getTime() + retain) return false;
