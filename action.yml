@@ -1,0 +1,17 @@
+name: 'Cleanup'
+inputs:
+  token:
+    default: ${{ github.token }}
+  repository:
+    default: ${{ github.repository }}
+  workflow:
+    default: ${{ github.workflow }}
+  branch:
+    default: ${{ github.ref_name }}
+  retain_days:
+    default: 7
+  keep_count:
+    default: 2
+runs:
+  using: 'node12'
+  main: 'cleanup.js'
