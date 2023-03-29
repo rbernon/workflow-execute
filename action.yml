@@ -13,5 +13,5 @@ inputs:
   keep_count:
     default: 2
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'cleanup.js'
