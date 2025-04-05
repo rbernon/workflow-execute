@@ -1,4 +1,4 @@
-name: 'Cleanup'
+name: 'Execute'
 inputs:
   token:
     default: ${{ github.token }}
@@ -8,10 +8,17 @@ inputs:
     default: ${{ github.workflow }}
   branch:
     default: ${{ github.ref_name }}
-  retain_days:
-    default: 7
-  keep_count:
-    default: 2
+  inputs:
+    defaults: "{}"
+  run_ids:
+    default: "{}"
+  wait:
+    default: false
+outputs:
+  run_id:
+    description: "Triggered workflow run id"
+  run_ids:
+    description: "Waited workflow run ids"
 runs:
   using: 'node20'
-  main: 'cleanup.js'
+  main: 'execute.js'

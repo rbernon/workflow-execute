@@ -1,22 +1,22 @@
 {
-  "name": "workflow-cleanup",
+  "name": "workflow-execute",
   "version": "1.0.0",
   "description": "",
-  "main": "cleanup.js",
+  "main": "execute.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rbernon/workflow-cleanup.git"
+    "url": "git+https://github.com/rbernon/workflow-execute.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rbernon/workflow-cleanup/issues"
+    "url": "https://github.com/rbernon/workflow-execute/issues"
   },
-  "homepage": "https://github.com/rbernon/workflow-cleanup#readme",
+  "homepage": "https://github.com/rbernon/workflow-execute#readme",
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0"
