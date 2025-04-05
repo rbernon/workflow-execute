@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const {DefaultArtifactClient} = require('@actions/artifact');
 
 async function waitForSeconds(seconds) {
   return new Promise(resolve => setTimeout(resolve, seconds * 1000))
@@ -14,7 +15,7 @@ async function waitForWorkflowRun(octokit, owner, repo, run_id) {
     });
 
     if (run.data.status === "completed") break;
-    console.log(`Waiting for https://github.com/${owner}/${repo}/actions/runs/${run_id}...`);
+    console.log(`Waiting for https://github.com/${owner}/${repo}/actions/runs/${run_id}`);
     await waitForSeconds(10);
   }
 }
@@ -31,7 +32,7 @@ async function waitForWorkflow(octokit, owner, repo, workflow, branch, event, da
     });
 
     if (runs.data.total_count) return runs.data.workflow_runs[0].id;
-    console.log(`Waiting for https://github.com/${owner}/${repo}/actions...`);
+    console.log(`Waiting for https://github.com/${owner}/${repo}/actions`);
     await waitForSeconds(5);
   }
 }
@@ -39,6 +40,7 @@ async function waitForWorkflow(octokit, owner, repo, workflow, branch, event, da
 async function run() {
   try {
     const token = core.getInput('token', {required: false});
+    const download = core.getInput('download', {required: false});
     let run_ids = core.getInput('run_ids', {required: false});
 
     const octokit = github.getOctokit(token);
@@ -70,9 +72,34 @@ async function run() {
       run_ids = JSON.parse(run_ids);
     }
 
+    const artifactClient = new DefaultArtifactClient();
+
     for (const [repository, run_id] of Object.entries(run_ids)) {
       const [owner, repo] = repository.split('/');
       await waitForWorkflowRun(octokit, owner, repo, run_id);
+
+      if (download === "false") continue;
+
+      const artifacts = await octokit.rest.actions.listWorkflowRunArtifacts({
+        owner,
+        repo,
+        run_id,
+      });
+      console.log(`Downloading ${artifacts.data.total_count} artifacts`);
+
+      for (let i = 0; i < artifacts.data.total_count; i++) {
+        const artifact = artifacts.data.artifacts[i];
+
+        await artifactClient.downloadArtifact(artifact.id, {
+          path: artifact.name,
+          findBy: {
+            token: token,
+            repositoryOwner: owner,
+            repositoryName: repo,
+            workflowRunId: run_id,
+          }
+        });
+      }
     }
     core.setOutput("run_ids", JSON.stringify(run_ids));
   } catch (error) {
